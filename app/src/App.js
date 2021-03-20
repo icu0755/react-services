@@ -5,25 +5,9 @@ class App extends React.Component {
     constructor() {
         super();
         this.state = {
-            posts: [
-                { id: 1, content: 'First post' },
-            ],
+            posts: [],
             newPostContent: '',
         };
-    }
-
-    onChange = (event) => {
-        this.setState({
-            [event.target.name]: event.target.value,
-        });
-    };
-
-    onAddPostClick = (event) => {
-        const { posts, newPostContent } = this.state;
-        this.setState({
-            newPostContent: '',
-            posts: [...posts, { id: posts.length + 1, content: newPostContent }],
-        });
     }
 
     render() {
@@ -48,6 +32,31 @@ class App extends React.Component {
                 <button type="button" onClick={this.onAddPostClick}>Add</button>
             </div>
         );
+    }
+
+    async componentDidMount() {
+        const { postsService } = this.props;
+        const posts = await postsService.listPosts();
+        this.setState({
+            posts,
+        });
+    }
+
+    onChange = (event) => {
+        this.setState({
+            [event.target.name]: event.target.value,
+        });
+    };
+
+    onAddPostClick = async (event) => {
+        const { postsService } = this.props;
+        const { posts, newPostContent } = this.state;
+        const newPost = await postsService.createPost({ content: newPostContent });
+
+        this.setState({
+            newPostContent: '',
+            posts: [...posts, newPost],
+        });
     }
 }
 
