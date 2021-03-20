@@ -1,25 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+class App extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            posts: [
+                { id: 1, content: 'First post' },
+            ],
+            newPostContent: '',
+        };
+    }
+
+    onChange = (event) => {
+        this.setState({
+            [event.target.name]: event.target.value,
+        });
+    };
+
+    onAddPostClick = (event) => {
+        const { posts, newPostContent } = this.state;
+        this.setState({
+            newPostContent: '',
+            posts: [...posts, { id: posts.length + 1, content: newPostContent }],
+        });
+    }
+
+    render() {
+        const { posts, newPostContent } = this.state;
+
+        return (
+            <div>
+                <ul>
+                    {
+                        posts.map(post => (
+                            <li key={post.id}>{`${post.id}. ${post.content}`}</li>
+                        ))
+                    }
+                </ul>
+
+                <input
+                    name="newPostContent"
+                    type="text"
+                    onChange={this.onChange}
+                    value={newPostContent}/>
+
+                <button type="button" onClick={this.onAddPostClick}>Add</button>
+            </div>
+        );
+    }
 }
 
 export default App;
