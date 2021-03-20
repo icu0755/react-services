@@ -9,6 +9,13 @@ let posts = [
     { id: 3, content: 'Third post' },
 ];
 
+function generateId() {
+    if (!posts.length) {
+        return 1;
+    }
+    return Math.max(...posts.map(post => post.id)) + 1;
+}
+
 const init = async () => {
 
     const server = Hapi.server({
@@ -24,6 +31,20 @@ const init = async () => {
         path: '/posts/',
         handler: (request, h) => {
             return posts;
+        }
+    });
+
+    server.route({
+        method: 'POST',
+        path: '/posts/',
+        handler: (request, h) => {
+            const { content } = request.payload;
+            const newPost = {
+                id: generateId(),
+                content,
+            }
+            posts.push(newPost);
+            return newPost;
         }
     });
 
