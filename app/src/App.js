@@ -11,6 +11,17 @@ class App extends React.Component {
         };
     }
 
+    componentDidMount() {
+        const { services, addPost } = this.props;
+        const { postsService } = services;
+        postsService.listPosts()
+            .then(posts => {
+                posts.forEach(post => {
+                    addPost(post);
+                })
+            });
+    }
+
     render() {
         const { newPostContent } = this.state;
         const { posts, onAddPostClick } = this.props;
@@ -31,7 +42,7 @@ class App extends React.Component {
                     onChange={this.onChange}
                     value={newPostContent}/>
 
-                <button type="button" onClick={(event) => onAddPostClick(event, newPostContent)}>Add</button>
+                <button type="button" onClick={(event) => onAddPostClick(newPostContent)}>Add</button>
             </div>
         );
     }
@@ -47,16 +58,15 @@ const mapStateToProps = ({ posts }) => ({
     posts: posts.posts,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-    onAddPostClick: (event, postContent) => {
-        console.log(`onAddPostClick postContent=${postContent}`);
-        dispatch(addPost({
-            id: +(new Date()),
-            content: postContent,
-        }))
+const mapDispatchToProps = (dispatch, ownProps) => ({
+    addPost: (post) => dispatch(addPost(post)),
+    onAddPostClick: (newPostContent) => {
+        const { postsService } = ownProps.services;
+        postsService.createPost({ content: newPostContent })
+            .then(post => dispatch(addPost(post)));
     }
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-    withServicesContext(App)
+export default withServicesContext(
+    connect(mapStateToProps, mapDispatchToProps)(App)
 );
