@@ -1,17 +1,19 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { withServicesContext } from './services/Context';
+import { addPost } from './actions/postsActions';
 
 class App extends React.Component {
     constructor() {
         super();
         this.state = {
-            posts: [],
             newPostContent: '',
         };
     }
 
     render() {
-        const { posts, newPostContent } = this.state;
+        const { newPostContent } = this.state;
+        const { posts, onAddPostClick } = this.props;
 
         return (
             <div>
@@ -29,35 +31,32 @@ class App extends React.Component {
                     onChange={this.onChange}
                     value={newPostContent}/>
 
-                <button type="button" onClick={this.onAddPostClick}>Add</button>
+                <button type="button" onClick={(event) => onAddPostClick(event, newPostContent)}>Add</button>
             </div>
         );
     }
 
-    async componentDidMount() {
-        const { postsService } = this.props.services;
-        const posts = await postsService.listPosts();
-        this.setState({
-            posts,
-        });
-    }
-
     onChange = (event) => {
         this.setState({
-            [event.target.name]: event.target.value,
-        });
-    };
-
-    onAddPostClick = async (event) => {
-        const { postsService } = this.props.services;
-        const { posts, newPostContent } = this.state;
-        const newPost = await postsService.createPost({ content: newPostContent });
-
-        this.setState({
-            newPostContent: '',
-            posts: [...posts, newPost],
+            newPostContent: event.target.value,
         });
     }
 }
 
-export default withServicesContext(App);
+const mapStateToProps = ({ posts }) => ({
+    posts: posts.posts,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    onAddPostClick: (event, postContent) => {
+        console.log(`onAddPostClick postContent=${postContent}`);
+        dispatch(addPost({
+            id: +(new Date()),
+            content: postContent,
+        }))
+    }
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(
+    withServicesContext(App)
+);
