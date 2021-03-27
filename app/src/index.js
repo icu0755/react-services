@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import Posts from './services/Posts';
-import ServicesContext from './services/Context';
+import { ServicesContext } from './services/Context';
 
 const postsService = new Posts('http://localhost:3010');
 const services = {

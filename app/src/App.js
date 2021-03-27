@@ -1,5 +1,5 @@
 import React from 'react';
-import ServicesContext from './services/Context';
+import { withServicesContext } from './services/Context';
 
 class App extends React.Component {
     constructor() {
@@ -35,7 +35,7 @@ class App extends React.Component {
     }
 
     async componentDidMount() {
-        const { postsService } = this.context;
+        const { postsService } = this.props.services;
         const posts = await postsService.listPosts();
         this.setState({
             posts,
@@ -49,7 +49,7 @@ class App extends React.Component {
     };
 
     onAddPostClick = async (event) => {
-        const { postsService } = this.context;
+        const { postsService } = this.props.services;
         const { posts, newPostContent } = this.state;
         const newPost = await postsService.createPost({ content: newPostContent });
 
@@ -60,6 +60,4 @@ class App extends React.Component {
     }
 }
 
-App.contextType = ServicesContext;
-
-export default App;
+export default withServicesContext(App);
